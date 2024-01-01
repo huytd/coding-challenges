@@ -17,3 +17,27 @@ else
   echo "$PASSED"
 fi
 
+echo "[#1b]\tShould handle non-existent file"
+expectOutput="Cannot open file foo.txt"
+actual=$(./cat foo.txt)
+output=$(echo "$actual" | grep "$expectOutput")
+if [[ -z "$output" ]]; then
+  echo "$FAILED"
+  echo "\tExpect: $expectOutput"
+  echo "\tActual: $actual"
+else
+  echo "$PASSED"
+fi
+
+echo "[#2]\tShould print file content"
+expectOutput=$(cat test.txt)
+actual=$(./cat test.txt)
+output=$(echo "$actual" | grep "$expectOutput")
+if [[ -z "$output" ]]; then
+  echo "$FAILED"
+  echo "\tExpect: $expectOutput"
+  echo "\tActual: $actual"
+else
+  echo "$PASSED"
+fi
+
