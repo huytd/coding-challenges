@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -39,6 +40,17 @@ int main(int argc, char **argv) {
       if (c == '\n') lines++;
     }
     printf("%d %s", lines, fileName);
+    goto finish;
+  }
+
+  if (strcmp(opt, "-w") == 0) {
+    int words = 0;
+    char c, last_c = ' ';
+    while ((c = fgetc(file)) != EOF) {
+      if (isspace(last_c) && !isspace(c)) words++;
+      last_c = c;
+    }
+    printf("%d %s", words, fileName);
     goto finish;
   }
 
