@@ -12,6 +12,11 @@ int countFileSize(char* fileName) {
 }
 
 int main(int argc, char **argv) {
+  if (argc < 3) {
+    printf("Not enough arguments");
+    return -1;
+  }
+
   char* opt = argv[1];
   char* fileName = argv[2];
 
@@ -24,7 +29,7 @@ int main(int argc, char **argv) {
   if (strcmp(opt, "-c") == 0) {
     int fileSize = countFileSize(fileName);
     printf("%d %s", fileSize, fileName);
-    return 0;
+    goto finish;
   }
 
   if (strcmp(opt, "-l") == 0) {
@@ -34,11 +39,13 @@ int main(int argc, char **argv) {
       if (c == '\n') lines++;
     }
     printf("%d %s", lines, fileName);
-    return 0;
+    goto finish;
   }
 
   printf("Unknown option %s", opt);
 
+finish:
   fclose(file);
+
   return 0;
 }
