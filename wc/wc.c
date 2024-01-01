@@ -6,6 +6,13 @@
 #include <sys/stat.h>
 #include <wchar.h>
 
+typedef struct {
+  int lines;
+  int words;
+  int chars;
+  int bytes;
+} count_t;
+
 FILE* openFile(char* fileName) {
   FILE* file = fopen(fileName, "r");
   if (file == NULL) {
@@ -15,72 +22,85 @@ FILE* openFile(char* fileName) {
   return file;
 }
 
-void countFileSize(char* fileName) {
+int countFileSize(char* fileName) {
   struct stat st;
   if (stat(fileName, &st) == -1) {
     printf("Cannot read file size");
     exit(-1);
   }
   int fileSize = st.st_size;
-  printf("%d %s", fileSize, fileName);
+  return fileSize;
 }
 
-void countLines(char* fileName) {
+count_t count(char* fileName) {
   FILE* file = openFile(fileName);
-  int count = 0;
-  char c;
-  while ((c = fgetc(file)) != EOF) {
-    if (c == '\n') count++;
-  }
-  fclose(file);
-  printf("%d %s", count, fileName);
-}
-
-void countWords(char* fileName) {
-  FILE* file = openFile(fileName);
-  int count = 0;
+  int wordCount = 0, lineCount = 0, charCount = 0;
   char c, last_c = ' ';
+
   while ((c = fgetc(file)) != EOF) {
-    if (isspace(last_c) && !isspace(c)) count++;
+    if (c == '\n') lineCount++;
+    if (isspace(last_c) && !isspace(c)) wordCount++;
     last_c = c;
   }
+
+  fseek(file, 0, SEEK_SET);
+
+  while ((fgetwc(file)) != EOF) {
+    charCount++;
+  }
+
   fclose(file);
-  printf("%d %s", count, fileName);
+
+  count_t result;
+  result.lines = lineCount;
+  result.words = wordCount;
+  result.chars = charCount;
+  result.bytes = countFileSize(fileName);
+
+  return result;
 }
 
-void countCharacters(char* fileName) {
-  FILE* file = openFile(fileName);
-  int count = 0;
-  while ((fgetwc(file)) != EOF) {
-    count++;
-  }
-  fclose(file);
-  printf("%d %s", count, fileName);
+int hasValidArguments(int argc, char **argv) {
+  int hasTwoArgs = argc == 3 && argv[1][0] == '-';
+  int hasOneArgs = argc == 2 && argv[1][0] != '-';
+  return hasTwoArgs || hasOneArgs;
 }
 
 int main(int argc, char **argv) {
   (void)setlocale(LC_ALL,"");
 
-  if (argc < 3) {
+  if (!hasValidArguments(argc, argv)) {
     printf("Not enough arguments");
     return -1;
   }
 
-  char opt = argv[1][1];
-  char* fileName = argv[2];
+  char opt = '\0';
+  char* fileName;
+
+  if (argv[1][0] == '-') {
+    opt = argv[1][1];
+    fileName = argv[2];
+  } else {
+    fileName = argv[1];
+  }
 
   switch (opt) {
     case 'c':
-      countFileSize(fileName);
+      printf("%d %s", count(fileName).bytes, fileName);
       break;
     case 'l':
-      countLines(fileName);
+      printf("%d %s", count(fileName).lines, fileName);
       break;
     case 'w':
-      countWords(fileName);
+      printf("%d %s", count(fileName).words, fileName);
       break;
     case 'm':
-      countCharacters(fileName);
+      printf("%d %s", count(fileName).chars, fileName);
+      break;
+    case '\0': {
+      count_t result = count(fileName);
+      printf("%d\t%d\t%d %s", result.lines, result.words, result.bytes, fileName);
+      }
       break;
     default:
       printf("Unknown option -%c", opt);

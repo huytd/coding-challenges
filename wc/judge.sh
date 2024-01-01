@@ -20,6 +20,30 @@ else
   echo "$PASSED"
 fi
 
+echo "[#1b]\tShould handle not enough arguments"
+expectOutput="Not enough arguments"
+actual=$(./wc -w)
+output=$(echo "$actual" | grep "$expectOutput")
+if [[ -z "$output" ]]; then
+  echo "$FAILED"
+  echo "\tExpect: $expectOutput"
+  echo "\tActual: $actual"
+else
+  echo "$PASSED"
+fi
+
+echo "[#1c]\tShould handle not enough arguments"
+expectOutput="Not enough arguments"
+actual=$(./wc -z)
+output=$(echo "$actual" | grep "$expectOutput")
+if [[ -z "$output" ]]; then
+  echo "$FAILED"
+  echo "\tExpect: $expectOutput"
+  echo "\tActual: $actual"
+else
+  echo "$PASSED"
+fi
+
 echo "[#2]\tShould handle unknown options"
 expectOutput="Unknown option -z"
 actual=$(./wc -z foo.txt)
@@ -92,4 +116,26 @@ else
   echo "$PASSED"
 fi
 
+echo "[#8]\tShould handle default option: Count everything"
+expectOutput="7145\t58164\t342190 test.txt"
+actual=$(./wc test.txt)
+output=$(echo "$actual" | grep "$expectOutput")
+if [[ -z "$output" ]]; then
+  echo "$FAILED"
+  echo "\tExpect: $expectOutput"
+  echo "\tActual: $actual"
+else
+  echo "$PASSED"
+fi
 
+echo "[#8b]\tShould handle non-existent file with no options"
+expectOutput="Cannot open file foo.txt"
+actual=$(./wc foo.txt)
+output=$(echo "$actual" | grep "$expectOutput")
+if [[ -z "$output" ]]; then
+  echo "$FAILED"
+  echo "\tExpect: $expectOutput"
+  echo "\tActual: $actual"
+else
+  echo "$PASSED"
+fi

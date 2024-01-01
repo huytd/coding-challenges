@@ -5,3 +5,6 @@ The first two steps are easy.
 
 In step 3, things get a little bit tricky because the input might contains multiple whitespace characters, like: "I am     a   King".
 
+In step 3, the tricky part is to handle multibyte characters.
+
+In step 5, we need to change the way we handle arguments, since now, the argument list can just be a file name only. Also, in the previous version, we count each of the type individually, now we need to count all at once.
