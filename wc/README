@@ -1,0 +1,7 @@
+Implementation Notes
+--------------------
+
+The first two steps are easy.
+
+In step 3, things get a little bit tricky because the input might contains multiple whitespace characters, like: "I am     a   King".
+
