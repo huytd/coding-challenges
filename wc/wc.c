@@ -1,15 +1,49 @@
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
-int countFileSize(char* fileName) {
+FILE* openFile(char* fileName) {
+  FILE* file = fopen(fileName, "r");
+  if (file == NULL) {
+    printf("Cannot open file %s", fileName);
+    exit(-1);
+  }
+  return file;
+}
+
+void countFileSize(char* fileName) {
   struct stat st;
   if (stat(fileName, &st) == -1) {
     printf("Cannot read file size");
-    return -1;
+    exit(-1);
   }
-  return st.st_size;
+  int fileSize = st.st_size;
+  printf("%d %s", fileSize, fileName);
+}
+
+void countLines(char* fileName) {
+  FILE* file = openFile(fileName);
+  int count = 0;
+  char c;
+  while ((c = fgetc(file)) != EOF) {
+    if (c == '\n') count++;
+  }
+  fclose(file);
+  printf("%d %s", count, fileName);
+}
+
+void countWords(char* fileName) {
+  FILE* file = openFile(fileName);
+  int count = 0;
+  char c, last_c = ' ';
+  while ((c = fgetc(file)) != EOF) {
+    if (isspace(last_c) && !isspace(c)) count++;
+    last_c = c;
+  }
+  fclose(file);
+  printf("%d %s", count, fileName);
 }
 
 int main(int argc, char **argv) {
@@ -18,46 +52,22 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  char* opt = argv[1];
+  char opt = argv[1][1];
   char* fileName = argv[2];
 
-  FILE* file = fopen(fileName, "r");
-  if (file == NULL) {
-    printf("Cannot open file %s", fileName);
-    return -1;
+  switch (opt) {
+    case 'c':
+      countFileSize(fileName);
+      break;
+    case 'l':
+      countLines(fileName);
+      break;
+    case 'w':
+      countWords(fileName);
+      break;
+    default:
+      printf("Unknown option -%c", opt);
   }
-
-  if (strcmp(opt, "-c") == 0) {
-    int fileSize = countFileSize(fileName);
-    printf("%d %s", fileSize, fileName);
-    goto finish;
-  }
-
-  if (strcmp(opt, "-l") == 0) {
-    int lines = 0;
-    char c;
-    while ((c = fgetc(file)) != EOF) {
-      if (c == '\n') lines++;
-    }
-    printf("%d %s", lines, fileName);
-    goto finish;
-  }
-
-  if (strcmp(opt, "-w") == 0) {
-    int words = 0;
-    char c, last_c = ' ';
-    while ((c = fgetc(file)) != EOF) {
-      if (isspace(last_c) && !isspace(c)) words++;
-      last_c = c;
-    }
-    printf("%d %s", words, fileName);
-    goto finish;
-  }
-
-  printf("Unknown option %s", opt);
-
-finish:
-  fclose(file);
 
   return 0;
 }
