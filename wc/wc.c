@@ -22,9 +22,19 @@ int main(int argc, char **argv) {
   }
 
   if (strcmp(opt, "-c") == 0) {
-      int fileSize = countFileSize(fileName);
-      printf("%d %s", fileSize, fileName);
-      return 0;
+    int fileSize = countFileSize(fileName);
+    printf("%d %s", fileSize, fileName);
+    return 0;
+  }
+
+  if (strcmp(opt, "-l") == 0) {
+    int lines = 0;
+    char c;
+    while ((c = fgetc(file)) != EOF) {
+      if (c == '\n') lines++;
+    }
+    printf("%d %s", lines, fileName);
+    return 0;
   }
 
   printf("Unknown option %s", opt);
