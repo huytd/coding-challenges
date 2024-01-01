@@ -1,8 +1,10 @@
 #include <ctype.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <wchar.h>
 
 FILE* openFile(char* fileName) {
   FILE* file = fopen(fileName, "r");
@@ -46,7 +48,19 @@ void countWords(char* fileName) {
   printf("%d %s", count, fileName);
 }
 
+void countCharacters(char* fileName) {
+  FILE* file = openFile(fileName);
+  int count = 0;
+  while ((fgetwc(file)) != EOF) {
+    count++;
+  }
+  fclose(file);
+  printf("%d %s", count, fileName);
+}
+
 int main(int argc, char **argv) {
+  (void)setlocale(LC_ALL,"");
+
   if (argc < 3) {
     printf("Not enough arguments");
     return -1;
@@ -64,6 +78,9 @@ int main(int argc, char **argv) {
       break;
     case 'w':
       countWords(fileName);
+      break;
+    case 'm':
+      countCharacters(fileName);
       break;
     default:
       printf("Unknown option -%c", opt);
