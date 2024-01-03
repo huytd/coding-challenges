@@ -53,3 +53,14 @@ else
   echo "$PASSED"
 fi
 
+echo "[#4]\tShould print from all input files"
+expectOutput=$(cat test.txt test2.txt | md5)
+actual=$(./cat test.txt test2.txt | md5)
+if [[ "$expectOutput" == "$actual" ]]; then
+  echo "$PASSED"
+else
+  echo "$FAILED"
+  echo "\tExpect: $expectOutput"
+  echo "\tActual: $actual"
+fi
+

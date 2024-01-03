@@ -29,16 +29,16 @@ class Cat {
       System.exit(-1);
     }
 
-    String fileName = args[0];
-
-    try {
-      if (fileName.equals("-")) {
-        printStdin();
-      } else {
-        printFile(fileName);
+    for (String fileName : args) {
+      try {
+        if (fileName.equals("-")) {
+          printStdin();
+        } else {
+          printFile(fileName);
+        }
+      } catch (Exception e) {
+        System.out.println("Cannot read input");
       }
-    } catch (Exception e) {
-      System.out.println("Cannot read input");
     }
   }
 }
