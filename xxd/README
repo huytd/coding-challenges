@@ -1,0 +1,11 @@
+xxd challenge
+-------------
+
+This is my xxd command reimplementation, for the "Build your own Xxd" challenge (https://codingchallenges.fyi/challenges/challenge-xxd).
+
+Implementation notes
+--------------------
+
+STEP 1:
+
+    Nothing really special in this step, just reading the input file and printing it in hexadecimal format.
