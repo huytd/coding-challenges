@@ -8,4 +8,15 @@ Implementation notes
 
 STEP 1:
 
-    Nothing really special in this step, just reading the input file and printing it in hexadecimal format.
+Nothing really special in this step, just reading the input file and printing it in hexadecimal format.
+
+STEP 2:
+
+It starts to get interesting now. The first thing to do is to parse the arguments.
+The Peekable<I> trait is very helpful in this case, I just have to peek the next token for the value if we see the "-g" param.
+
+The second thing is to modify the print function to use the config values.
+
+Funny, for the group size, all I have to change is just pass the group size as chunk size for the Vec::chunks method.
+
+The little endian part gonna be a little tricky.

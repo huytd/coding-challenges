@@ -1,33 +1,64 @@
 use std::fs::File;
-use std::io::Read;
+use std::io::{stdout, Read, Write};
 
-fn print_lines(line: usize, buffer: [u8; 16]) {
-    let offset = line * 16;
-    print!("{:08x}: ", offset);
+struct Config {
+    use_little_endian: bool,
+    group_size: usize
+}
 
-    for chunk in buffer.chunks(2) {
-        for byte in chunk {
-            print!("{:02x}", byte);
+impl Config {
+    pub fn from_args(args: &[String]) -> Self {
+        let mut use_little_endian = false;
+        let mut group_size = 2;
+        let mut iter = args.iter().peekable();
+        while let Some(arg) = iter.next() {
+            match arg.as_str() {
+                "-e" => use_little_endian = true,
+                "-g" => {
+                    match iter.peek() {
+                        Some(value) => group_size = value.parse::<usize>().unwrap_or(2),
+                        None => panic!("Invalid arguments"),
+                    }
+                }
+                _ => {}
+            }
         }
-        print!(" ");
+        return Config { use_little_endian, group_size };
+    }
+}
+
+fn print_lines(line: usize, buffer: [u8; 16], config: &Config) {
+    let mut stdout = stdout();
+    let offset = line * 16;
+    _ = write!(stdout, "{:08x}: ", offset);
+
+    for chunk in buffer.chunks(config.group_size) {
+        for byte in chunk {
+            _ = write!(stdout, "{:02x}", byte);
+        }
+        _ = write!(stdout, " ");
     }
 
-    print!(" ");
+    _ = write!(stdout, " ");
 
     for b in buffer.iter() {
         if *b >= 32 && *b <= 126 {
-            print!("{}", *b as char);
+            _ = write!(stdout, "{}", *b as char);
         } else {
-            print!(".");
+            _ = write!(stdout, ".");
         }
     }
 
-    println!();
+    _ = write!(stdout, "\n");
 }
 
 fn main() {
-    let args = std::env::args().collect::<Vec<String>>();
-    let file_name = args[1].to_string();
+    let args = std::env::args().skip(1).collect::<Vec<String>>();
+    let Some(file_name) = args.iter().find(|arg| arg.contains(".")) else {
+        panic!("Missing file name");
+    };
+
+    let config = Config::from_args(&args);
 
     let mut file = File::open(&file_name).expect("Unable to open file");
     let mut buffer = [0; 16];
@@ -37,7 +68,7 @@ fn main() {
         if n == 0 {
             break;
         }
-        print_lines(line, buffer);
+        print_lines(line, buffer, &config);
         line += 1;
     }
 }
