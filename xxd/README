@@ -19,4 +19,6 @@ The second thing is to modify the print function to use the config values.
 
 Funny, for the group size, all I have to change is just pass the group size as chunk size for the Vec::chunks method.
 
-The little endian part gonna be a little tricky.
+I thought the little endian part will be tricky, but turned out it's not. We just need to print each chunk in reversed order.
+
+But printing spaces before the ASCII part of the output was confusing at first, it's not documented anywhere, but I guees, if we are printing in little endian, we will need more spaces than printing in big endian mode. For more readable output.

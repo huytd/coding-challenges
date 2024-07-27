@@ -23,6 +23,9 @@ impl Config {
                 _ => {}
             }
         }
+        if use_little_endian {
+            group_size = group_size.max(4);
+        }
         return Config { use_little_endian, group_size };
     }
 }
@@ -33,13 +36,19 @@ fn print_lines(line: usize, buffer: [u8; 16], config: &Config) {
     _ = write!(stdout, "{:08x}: ", offset);
 
     for chunk in buffer.chunks(config.group_size) {
-        for byte in chunk {
-            _ = write!(stdout, "{:02x}", byte);
+        if config.use_little_endian {
+            chunk.iter().rev().for_each(|byte| _ = write!(stdout, "{:02x}", byte));
+        } else {
+            chunk.iter().for_each(|byte| _ = write!(stdout, "{:02x}", byte));
         }
         _ = write!(stdout, " ");
     }
 
-    _ = write!(stdout, " ");
+    if config.use_little_endian {
+        _ = write!(stdout, "  ");
+    } else {
+        _ = write!(stdout, " ");
+    }
 
     for b in buffer.iter() {
         if *b >= 32 && *b <= 126 {
@@ -50,6 +59,7 @@ fn print_lines(line: usize, buffer: [u8; 16], config: &Config) {
     }
 
     _ = write!(stdout, "\n");
+    _ = stdout.flush();
 }
 
 fn main() {
